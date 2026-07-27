@@ -59,6 +59,7 @@ login_shell = "/bin/zsh"
 
 [dotfiles]
 "~/.config/mise/conf.d/10-public.toml" = { source = "~/Developer/dotfiles/mise.toml", mode = "symlink" }
+"~/.config/mise/mise.lock" = { source = "~/Developer/dotfiles/mise.lock", mode = "symlink" }
 "~/.zshenv" = { source = "~/Developer/dotfiles/dotfiles/zsh/.zshenv", mode = "symlink" }
 "~/.zprofile" = { source = "~/Developer/dotfiles/dotfiles/zsh/.zprofile", mode = "symlink" }
 "~/.zshrc" = { source = "~/Developer/dotfiles/dotfiles/zsh/.zshrc", mode = "symlink" }
