@@ -11,8 +11,9 @@ The baseline and private overlay are **applied and verified** on the current
 machine with mise 2026.7.14. All locked tools and native packages are present,
 Pi Harness is installed with host/model ownership opt-outs, and every declared
 bootstrap state reports current. PostgreSQL 14 remains linked; PostgreSQL 18 is
-installed separately; both services remain stopped. The repositories have no
-remotes.
+installed separately; both services remain stopped. This baseline is published
+as a public repository; private machine metadata remains in the separate
+private overlay repository.
 
 Requirements:
 
