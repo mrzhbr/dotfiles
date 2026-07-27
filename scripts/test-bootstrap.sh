@@ -22,6 +22,9 @@ tmp="$(mktemp -d)"
 trap 'rm -rf "$tmp"' EXIT
 mkdir -p "$tmp/Developer" "$tmp/.config/mise/conf.d" "$tmp/.local/share/mise" "$tmp/.cache/mise"
 ln -s "$ROOT" "$tmp/Developer/dotfiles"
+if [[ -d "$HOME/Developer/dotfiles-private" ]]; then
+  ln -s "$HOME/Developer/dotfiles-private" "$tmp/Developer/dotfiles-private"
+fi
 
 mise_env=(
   env
@@ -29,6 +32,7 @@ mise_env=(
   MISE_DATA_DIR="$tmp/.local/share/mise"
   MISE_CACHE_DIR="$tmp/.cache/mise"
   MISE_IGNORED_CONFIG_PATHS="${XDG_CONFIG_HOME:-$HOME/.config}/mise"
+  MISE_TRUSTED_CONFIG_PATHS="${XDG_CONFIG_HOME:-$HOME/.config}/mise:$HOME/Developer/dotfiles:$HOME/Developer/dotfiles-private"
 )
 "${mise_env[@]}" mise trust "$ROOT/mise.toml" >/dev/null
 "${mise_env[@]}" mise trust "$tmp/.config/mise/conf.d/10-public.toml" >/dev/null

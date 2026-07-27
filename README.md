@@ -7,10 +7,12 @@ and machine-specific preferences.
 
 ## Status
 
-This is an **unapplied dotfile scaffold**. mise 2026.7.14, all locked developer
-tools, and PostgreSQL 18 are installed, but dotfiles, private overlays, Pi
-Harness, macOS defaults, services, and Git remotes have not been applied.
-PostgreSQL 14 remains linked and both PostgreSQL services remain stopped.
+The baseline and private overlay are **applied and verified** on the current
+machine with mise 2026.7.14. All locked tools and native packages are present,
+Pi Harness is installed with host/model ownership opt-outs, and every declared
+bootstrap state reports current. PostgreSQL 14 remains linked; PostgreSQL 18 is
+installed separately; both services remain stopped. The repositories have no
+remotes.
 
 Requirements:
 
@@ -18,9 +20,9 @@ Requirements:
 - mise 2026.7.4 or newer
 - Git
 
-Both repositories pass mise status and isolated-home dry-run validation on
-mise 2026.7.14. Do not run `mise bootstrap --force-dotfiles` until every
-conflict has been reviewed and backed up.
+Both repositories pass aggregate mise status, isolated-home dry-runs, safety
+checks, and runtime verification on mise 2026.7.14. Existing targets were
+backed up before the initial forced cutover.
 
 ## Ownership
 
@@ -42,7 +44,7 @@ These checks are safe and do not apply configuration:
 ./scripts/validate.sh
 ```
 
-After upgrading mise, preview only:
+Preview bootstrap convergence without applying changes:
 
 ```bash
 mise trust
@@ -50,9 +52,8 @@ mise run bootstrap:status
 mise run bootstrap:dry-run
 ```
 
-## Applying later
+## Legacy cleanup
 
-A real-machine cutover is deliberately deferred. It requires reviewed backups,
-an isolated test-home run, successful dry-runs, and explicit approval. Legacy
-NVM, Conda, PostgreSQL 14, and other installations stay in place until their
-mise-managed replacements have been verified.
+The initial cutover is complete, but NVM, Conda, PostgreSQL 14, and other legacy
+installations remain intentionally untouched. Removal and PostgreSQL data
+migration require a separate approval after an observation period.
