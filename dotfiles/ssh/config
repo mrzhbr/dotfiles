@@ -1,0 +1,12 @@
+# Public SSH defaults. Host mappings live in ~/.ssh/config.local.
+Include ~/.ssh/config.local
+
+Host *
+  AddKeysToAgent yes
+  IgnoreUnknown UseKeychain
+  UseKeychain yes
+  ServerAliveInterval 30
+  ServerAliveCountMax 3
+  ControlMaster auto
+  ControlPersist 10m
+  ControlPath ~/.ssh/controlmasters/%C

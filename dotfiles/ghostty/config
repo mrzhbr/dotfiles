@@ -1,0 +1,36 @@
+# Ghostty visual refresh
+# Reload with Command+Shift+, in Ghostty.
+# Note: background opacity/blur changes may require fully restarting Ghostty on macOS.
+
+# Soft, polished theme pair that follows macOS light/dark mode.
+theme = light:Catppuccin Latte,dark:Catppuccin Mocha
+
+# Readable built-in macOS monospace font.
+font-family = Menlo
+font-size = 14
+
+# Breathing room around terminal content.
+window-padding-x = 16
+window-padding-y = 14
+window-padding-balance = true
+
+# Modern macOS window feel.
+macos-titlebar-style = transparent
+macos-window-shadow = true
+window-decoration = auto
+window-colorspace = display-p3
+
+# Subtle translucency without hurting readability.
+background-opacity = 0.95
+background-blur = true
+
+# Small quality-of-life visual tweaks.
+cursor-style = bar
+cursor-style-blink = true
+unfocused-split-opacity = 0.85
+scrollbar = system
+
+# Other nice built-in themes to try:
+# theme = light:Rose Pine Dawn,dark:Rose Pine Moon
+# theme = light:TokyoNight Day,dark:TokyoNight Storm
+# theme = light:Kanagawa Lotus,dark:Kanagawa Wave

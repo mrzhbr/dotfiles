@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+session="${1:-main}"
+if [[ ! "$session" =~ ^[A-Za-z0-9_.-]+$ ]]; then
+  echo "Invalid tmux session name: $session" >&2
+  exit 2
+fi
+
+exec ssh -t remote-secondary "tmux new-session -A -s '$session'"

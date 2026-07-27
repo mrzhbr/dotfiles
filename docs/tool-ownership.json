@@ -1,0 +1,54 @@
+{
+  "mise": {
+    "node": ["node", "npm", "npx", "corepack", "pnpm", "yarn"],
+    "python": ["python", "python3"],
+    "uv": ["uv"],
+    "bun": ["bun"],
+    "zig": ["zig"],
+    "rust": ["rustc", "cargo", "rustup", "clippy-driver", "rustfmt", "rust-analyzer"],
+    "java": ["java", "javac"],
+    "maven": ["mvn"],
+    "awscli": ["aws"],
+    "bazelisk": ["bazelisk", "bazel"],
+    "gh": ["gh"],
+    "git-filter-repo": ["git-filter-repo"],
+    "gitleaks": ["gitleaks"],
+    "hadolint": ["hadolint"],
+    "shellcheck": ["shellcheck"],
+    "neovim": ["nvim"],
+    "tree-sitter": ["tree-sitter"],
+    "tectonic": ["tectonic"],
+    "herdr": ["herdr"],
+    "pi": ["pi"],
+    "claude-code": ["claude"],
+    "codex": ["codex"],
+    "opencode": ["opencode"]
+  },
+  "brew": {
+    "git": ["git"],
+    "tmux": ["tmux"],
+    "ffmpeg": ["ffmpeg", "ffprobe"],
+    "graphviz": ["dot"],
+    "dvisvgm": ["dvisvgm"],
+    "espeak-ng": ["espeak-ng"],
+    "pkgconf": ["pkg-config"],
+    "poppler": ["pdftotext", "pdfinfo"],
+    "postgresql@18": ["psql", "pg_ctl"],
+    "ollama": ["ollama"],
+    "tree": ["tree"]
+  },
+  "brew-cask": {
+    "docker-desktop": [],
+    "ghostty": [],
+    "visual-studio-code": ["code"]
+  },
+  "excluded": [
+    "anaconda",
+    "avm",
+    "conda",
+    "r-app",
+    "rstudio",
+    "solana",
+    "spotifyd"
+  ]
+}

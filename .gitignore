@@ -1,0 +1,28 @@
+.DS_Store
+mise.local.toml
+mise.local.lock
+*.local
+*.log
+*.sock
+*.sqlite
+*.sqlite3
+*.db
+*.bak
+*.backup
+*.pem
+*.key
+.env
+.env.*
+!.env.example
+
+# Runtime and generated state
+.auth/
+auth.json
+credentials.json
+sessions/
+history/
+cache/
+node_modules/
+
+# Test artifacts
+.tmp/

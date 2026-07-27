@@ -1,0 +1,50 @@
+{
+  "terminal": {
+    "new_cwd": "follow"
+  },
+  "keys": {
+    "prefix": "ctrl+s",
+    "help": "prefix+?",
+    "settings": "prefix+shift+s",
+    "detach": "prefix+d",
+    "reload_config": "prefix+r",
+    "open_notification_target": "prefix+shift+o",
+    "workspace_picker": ["prefix+w", "prefix+s"],
+    "goto": ["prefix+g", "prefix+q"],
+    "new_workspace": "prefix+plus",
+    "next_workspace": "prefix+n",
+    "previous_workspace": "prefix+b",
+    "rename_workspace": ["prefix+shift+w", "prefix+$"],
+    "new_tab": "prefix+c",
+    "rename_tab": "prefix+comma",
+    "previous_tab": "prefix+p",
+    "next_tab": "prefix+shift+n",
+    "switch_tab": "prefix+1..9",
+    "close_tab": "prefix+ampersand",
+    "split_vertical": "prefix+h",
+    "split_horizontal": "prefix+v",
+    "focus_pane_left": "prefix+left",
+    "focus_pane_down": "prefix+down",
+    "focus_pane_up": "prefix+up",
+    "focus_pane_right": "prefix+right",
+    "cycle_pane_next": "prefix+o",
+    "last_pane": "prefix+;",
+    "swap_pane_up": ["prefix+shift+k", "prefix+{"],
+    "swap_pane_down": ["prefix+shift+j", "prefix+}"],
+    "close_pane": "prefix+x",
+    "zoom": "prefix+z",
+    "copy_mode": "prefix+[",
+    "resize_mode": "prefix+shift+r",
+    "toggle_sidebar": "prefix+shift+b"
+  },
+  "ui": {
+    "mouse_capture": true,
+    "copy_on_select": true,
+    "agent_panel_sort": "priority",
+    "show_agent_labels_on_pane_borders": true
+  },
+  "theme": {
+    "name": "terminal",
+    "auto_switch": false
+  }
+}
