@@ -129,13 +129,13 @@ url = "https://github.com/anomalyco/opencode/releases/download/v1.4.0/opencode-d
 url_api = "https://api.github.com/repos/anomalyco/opencode/releases/assets/391171098"
 
 [[tools.pi]]
-version = "0.80.10"
+version = "0.82.1"
 backend = "aqua:earendil-works/pi"
 
 [tools.pi."platforms.macos-arm64"]
-checksum = "sha256:4406ed227c486f2e3c16cf14f793dc3ad46b5d01bf69135a2424cffa58a9a34b"
-url = "https://github.com/earendil-works/pi/releases/download/v0.80.10/pi-darwin-arm64.tar.gz"
-url_api = "https://api.github.com/repos/earendil-works/pi/releases/assets/479689739"
+checksum = "sha256:ca5b660ee0dbf2b4169f69753cf60f4e0edddff4a49427cdd34660e41280249f"
+url = "https://github.com/earendil-works/pi/releases/download/v0.82.1/pi-darwin-arm64.tar.gz"
+url_api = "https://api.github.com/repos/earendil-works/pi/releases/assets/489434434"
 
 [[tools.python]]
 version = "3.14.3"
