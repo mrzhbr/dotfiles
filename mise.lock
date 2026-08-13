@@ -112,12 +112,12 @@ backend = "vfox:mise-plugins/vfox-neovim"
 url = "https://github.com/neovim/neovim/releases/download/v0.12.3/nvim-macos-arm64.tar.gz"
 
 [[tools.node]]
-version = "23.3.0"
+version = "24.19.0"
 backend = "core:node"
 
 [tools.node."platforms.macos-arm64"]
-checksum = "sha256:472b9109dd9987ea49916f12b01ed2f09f1c4bf4befcf5695c1b9fd9cff3d177"
-url = "https://nodejs.org/dist/v23.3.0/node-v23.3.0-darwin-arm64.tar.gz"
+checksum = "sha256:8294b7aa9b03997481c06babf1e8b270c859358f27da57a11509afe537ac381d"
+url = "https://nodejs.org/dist/v24.19.0/node-v24.19.0-darwin-arm64.tar.gz"
 
 [[tools.opencode]]
 version = "1.4.0"
@@ -128,14 +128,9 @@ checksum = "sha256:be968e559051bb622f0b9fc628216670240b7e7441a11b0eb11f79a6f0323
 url = "https://github.com/anomalyco/opencode/releases/download/v1.4.0/opencode-darwin-arm64.zip"
 url_api = "https://api.github.com/repos/anomalyco/opencode/releases/assets/391171098"
 
-[[tools.pi]]
-version = "0.82.1"
-backend = "aqua:earendil-works/pi"
-
-[tools.pi."platforms.macos-arm64"]
-checksum = "sha256:ca5b660ee0dbf2b4169f69753cf60f4e0edddff4a49427cdd34660e41280249f"
-url = "https://github.com/earendil-works/pi/releases/download/v0.82.1/pi-darwin-arm64.tar.gz"
-url_api = "https://api.github.com/repos/earendil-works/pi/releases/assets/489434434"
+[[tools."npm:@earendil-works/pi-coding-agent"]]
+version = "0.84.1"
+backend = "npm:@earendil-works/pi-coding-agent"
 
 [[tools.python]]
 version = "3.14.3"

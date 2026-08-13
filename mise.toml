@@ -7,7 +7,7 @@ minimum_release_age = "7d"
 idiomatic_version_file_enable_tools = ["java", "node", "python", "rust", "zig"]
 
 [tools]
-node = { version = "23.3.0", postinstall = "corepack enable" }
+node = { version = "24.19.0", postinstall = "corepack enable" }
 python = "3.14.3"
 uv = "0.10.2"
 bun = "1.3.10"
@@ -33,7 +33,7 @@ neovim = "0.12.3"
 tree-sitter = "0.26.9"
 "github:tectonic-typesetting/tectonic" = "0.15.0"
 herdr = "0.7.4"
-pi = "0.82.1"
+"npm:@earendil-works/pi-coding-agent" = "0.84.1"
 claude-code = "2.1.181"
 codex = "0.135.0"
 opencode = "1.4.0"
@@ -74,20 +74,20 @@ login_shell = "/bin/zsh"
 
 [tasks.safety]
 description = "Check the repository for secret files and private identifiers"
-run = "./scripts/check-safety.sh"
+run = "cd \"$HOME/Developer/dotfiles\" && ./scripts/check-safety.sh"
 
 [tasks.validate]
 description = "Validate configuration, ownership, and behavioral contracts"
 depends = ["safety"]
-run = "./scripts/validate.sh"
+run = "cd \"$HOME/Developer/dotfiles\" && ./scripts/validate.sh"
 
 [tasks."backup:dry-run"]
 description = "List managed HOME targets that require a cutover backup"
-run = "./scripts/backup-managed-targets.sh --dry-run"
+run = "cd \"$HOME/Developer/dotfiles\" && ./scripts/backup-managed-targets.sh --dry-run"
 
 [tasks."backup:apply"]
 description = "Back up managed HOME targets without changing them"
-run = "./scripts/backup-managed-targets.sh --apply"
+run = "cd \"$HOME/Developer/dotfiles\" && ./scripts/backup-managed-targets.sh --apply"
 
 [tasks."tools:dry-run"]
 description = "Preview locked mise tool installation"
@@ -103,15 +103,15 @@ run = "mise bootstrap --dry-run"
 
 [tasks."pi:harness-status"]
 description = "Report whether the canonical Pi Harness checkout is ready"
-run = "./scripts/pi-harness-status.sh"
+run = "cd \"$HOME/Developer/dotfiles\" && ./scripts/pi-harness-status.sh"
 
 [tasks.bootstrap]
 description = "Run idempotent post-tool setup after mise bootstrap"
 run = [
-  "./scripts/trust-layered-configs.sh",
-  "./scripts/prepare-user-dirs.sh",
-  "./scripts/install-vscode-extensions.sh",
-  "./scripts/ensure-pi-harness.sh",
-  "./scripts/validate.sh",
-  "./scripts/pi-harness-status.sh",
+  "cd \"$HOME/Developer/dotfiles\" && ./scripts/trust-layered-configs.sh",
+  "cd \"$HOME/Developer/dotfiles\" && ./scripts/prepare-user-dirs.sh",
+  "cd \"$HOME/Developer/dotfiles\" && ./scripts/install-vscode-extensions.sh",
+  "cd \"$HOME/Developer/dotfiles\" && ./scripts/ensure-pi-harness.sh",
+  "cd \"$HOME/Developer/dotfiles\" && ./scripts/validate.sh",
+  "cd \"$HOME/Developer/dotfiles\" && ./scripts/pi-harness-status.sh",
 ]

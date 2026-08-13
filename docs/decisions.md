@@ -4,7 +4,7 @@
 - Keep a public-safe baseline and a separate private, non-secret overlay.
 - Keep Pi Harness as an independent repository.
 - Standardize Python on mise plus uv; Conda is not part of the baseline.
-- Replace NVM with mise while preserving Node 23.3.0 for the migration.
+- Replace NVM with mise and standardize on Node 24.19.0 LTS.
 - Use Temurin Java 25 LTS globally; projects may pin Java 17.
 - Keep Rust and Java/Maven; omit R/RStudio and Solana/Anchor.
 - Manage Neovim and VS Code only.
