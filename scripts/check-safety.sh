@@ -3,9 +3,14 @@ set -euo pipefail
 
 ROOT="${1:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
 
-python3 - "$ROOT" <<'PY'
+scan="$(mktemp -d)"
+trap 'rm -rf "$scan"' EXIT
+
+python3 - "$ROOT" "$scan" <<'PY'
 from pathlib import Path
 import re
+import shutil
+import subprocess
 import sys
 
 root = Path(sys.argv[1]).resolve()
@@ -28,10 +33,27 @@ secret_key = re.compile(
 )
 allowed_value = re.compile(r"^(?:[\"']?\$\{|[\"']?\$[A-Z_]|[\"']?<[^>]+>|[\"']?(?:none|not-needed|keychain)[\"']?$)", re.I)
 
+# These exact generated roots are never public source. Reject tracked files
+# there before skipping their content; arbitrary gitignore entries are NOT used.
+generated = (Path(".pi/subagents"), Path(".ruff_cache"))
+tracked = subprocess.run(
+    ["git", "-C", str(root), "ls-files", "-z", "--", *(str(path) for path in generated)],
+    capture_output=True, check=False,
+)
 errors: list[str] = []
+if tracked.returncode == 0:
+    for name in tracked.stdout.decode().split("\0"):
+        if name:
+            errors.append(f"generated artifact must not be tracked: {name}")
+elif (root / ".git").exists():
+    raise SystemExit("cannot check tracked generated artifacts")
+if errors:
+    raise SystemExit("Safety check failed:\n  - " + "\n  - ".join(sorted(set(errors))))
+
+export = Path(sys.argv[2])
 for path in root.rglob("*"):
     rel = path.relative_to(root)
-    if ".git" in rel.parts:
+    if rel.parts[0] == ".git" or any(rel.is_relative_to(prefix) for prefix in generated):
         continue
     lower_parts = {part.lower() for part in rel.parts}
     if path.is_file():
@@ -44,6 +66,11 @@ for path in root.rglob("*"):
         ):
             errors.append(f"forbidden tracked path: {rel}")
             continue
+        # Gitleaks receives this same reviewed source set, including untracked
+        # source and ignored files outside the two explicit generated roots.
+        target = export / rel
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(path, target, follow_symlinks=False)
         if rel.as_posix() == "scripts/check-safety.sh":
             continue
         try:
@@ -81,7 +108,7 @@ print(f"Safety path/content checks passed: {root}")
 PY
 
 if command -v gitleaks >/dev/null 2>&1; then
-  gitleaks dir --no-banner --redact "$ROOT"
+  gitleaks dir --no-banner --redact "$scan"
   echo "Gitleaks scan passed."
 else
   echo "warning: gitleaks is unavailable; built-in safety checks passed." >&2

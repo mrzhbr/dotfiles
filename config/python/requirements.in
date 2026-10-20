@@ -1,0 +1,13 @@
+# Shared mise Python environment: notebooks, scientific packages, and Python CLIs.
+# Keep these separate from project-specific environments.
+ipykernel==7.4.0
+ipython==9.17.1
+jupyterlab==4.6.4
+notebook==7.6.3
+matplotlib==3.11.2
+networkx==3.7
+numpy==2.5.3
+pandas==3.0.6
+jedi-language-server==0.47.0
+ruff==0.17.0
+yamllint==1.38.0

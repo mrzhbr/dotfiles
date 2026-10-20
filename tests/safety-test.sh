@@ -25,4 +25,45 @@ if "$CHECK" "$tmp/bad-path" >/dev/null 2>&1; then
   exit 1
 fi
 
-echo "Safety fixture tests passed."
+# Generated artifacts may contain private runtime context. Neither scanner may
+# read them, but tracked artifacts must fail even when force-added past ignores.
+fixture="$tmp/generated"
+mkdir -p "$fixture/.pi/subagents" "$fixture/.ruff_cache"
+printf '.pi/subagents/\n.ruff_cache/\n.env\n' >"$fixture/.gitignore"
+printf '/%s/%s/private\n' 'Users' 'someone' >"$fixture/.pi/subagents/transcript.jsonl"
+printf 'runtime cache\n' >"$fixture/.ruff_cache/tool.log"
+git -C "$fixture" init --quiet
+"$CHECK" "$fixture" >/dev/null
+
+# An ignored but untracked forbidden file outside generated roots still fails.
+printf 'placeholder\n' >"$fixture/.env"
+if "$CHECK" "$fixture" >/dev/null 2>&1; then
+  echo "expected an ignored untracked .env to fail" >&2
+  exit 1
+fi
+rm "$fixture/.env"
+
+# The exception is not the entire .pi directory.
+printf '/%s/%s/private\n' 'Users' 'someone' >"$fixture/.pi/source.txt"
+if "$CHECK" "$fixture" >/dev/null 2>&1; then
+  echo "expected non-generated .pi source to be scanned" >&2
+  exit 1
+fi
+rm "$fixture/.pi/source.txt"
+
+# Staging happens only in disposable fixture repositories, never this checkout.
+for generated in .pi/subagents .ruff_cache; do
+  tracked="$tmp/tracked-${generated//\//-}"
+  mkdir -p "$tracked/$generated"
+  git -C "$tracked" init --quiet
+  printf '%s/\n' "$generated" >"$tracked/.gitignore"
+  printf 'ordinary generated data\n' >"$tracked/$generated/artifact.txt"
+  git -C "$tracked" add --force "$generated/artifact.txt"
+  if "$CHECK" "$tracked" >"$tmp/scan-output" 2>&1; then
+    echo "expected force-tracked $generated to fail" >&2
+    exit 1
+  fi
+  grep -q 'generated artifact must not be tracked' "$tmp/scan-output"
+done
+
+echo "Safety fixture tests passed (including generated-root and untracked-file regressions)."

@@ -1,0 +1,39 @@
+name: Public validation
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: macos-14
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - name: Read required mise version
+        id: mise-version
+        run: |
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import tomllib
+          with open("mise.toml", "rb") as handle:
+              print("version=" + tomllib.load(handle)["min_version"]["hard"])
+          PY
+      - uses: jdx/mise-action@v3
+        with:
+          version: ${{ steps.mise-version.outputs.version }}
+          install: false
+          cache: false
+      - name: Install validation tools only
+        run: brew install shellcheck gitleaks
+      - name: Validate public contracts and safety
+        run: ./scripts/validate.sh
+      - name: Exercise isolated public bootstrap preview
+        run: ./scripts/test-bootstrap.sh
+      - name: Check validation did not modify tracked inputs
+        run: git diff --exit-code

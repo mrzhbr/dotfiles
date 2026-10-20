@@ -16,6 +16,8 @@ mise.local.lock
 !.env.example
 
 # Runtime and generated state
+/.pi/subagents/
+/.ruff_cache/
 .auth/
 auth.json
 credentials.json

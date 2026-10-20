@@ -1,4 +1,4 @@
-min_version = { hard = "2026.7.4" }
+min_version = { hard = "2026.10.15" }
 
 [settings]
 lockfile = true
@@ -7,10 +7,10 @@ minimum_release_age = "7d"
 idiomatic_version_file_enable_tools = ["java", "node", "python", "rust", "zig"]
 
 [tools]
-node = { version = "24.19.0", postinstall = "corepack enable" }
-python = "3.14.3"
-uv = "0.10.2"
-bun = "1.3.10"
+node = { version = "24.21.0", postinstall = "corepack enable" }
+python = { version = "3.14.8", postinstall = '"$HOME/Developer/dotfiles/scripts/setup-jupyter.sh" "$MISE_TOOL_INSTALL_PATH/bin/python"' }
+uv = "0.13.0"
+bun = "1.4.3"
 zig = "0.16.0"
 rust = { version = "1.93.1", profile = "default", components = [
   "clippy",
@@ -20,23 +20,25 @@ rust = { version = "1.93.1", profile = "default", components = [
 ], targets = [
   "aarch64-apple-darwin",
 ] }
-java = "temurin-25.0.3+9.0.LTS"
-maven = "3.9.11"
-awscli = "2.34.11"
-bazelisk = "1.26.0"
-gh = "2.87.3"
+java = "temurin-25.0.4+101.0.LTS"
+maven = "3.9.16"
+awscli = "2.37.13"
+bazelisk = { version = "1.29.0", postinstall = 'bash "$HOME/Developer/dotfiles/scripts/setup-bazelisk.sh" "$MISE_TOOL_INSTALL_PATH"' }
+gh = "2.102.0"
 git-filter-repo = "2.47.0"
 gitleaks = "8.30.1"
-hadolint = "2.14.0"
+hadolint = "2.15.1"
 shellcheck = "0.11.0"
-neovim = "0.12.3"
-tree-sitter = "0.26.9"
-"github:tectonic-typesetting/tectonic" = "0.15.0"
-herdr = "0.7.4"
-"npm:@earendil-works/pi-coding-agent" = "0.84.1"
-claude-code = "2.1.181"
-codex = "0.135.0"
-opencode = "1.4.0"
+neovim = "0.12.6"
+tree-sitter = "0.27.1"
+"github:tectonic-typesetting/tectonic" = "0.17.0"
+herdr = "0.9.3"
+"npm:@earendil-works/pi-coding-agent" = "1.3.0"
+claude-code = "2.1.299"
+codex = "0.162.1"
+opencode = "1.19.0"
+"npm:ctx7" = "0.4.2"
+"pypi:browser-use" = { version = "0.13.11", python = "3.13.16" }
 
 [bootstrap.packages]
 "brew:git" = "latest"
@@ -90,8 +92,20 @@ description = "Back up managed HOME targets without changing them"
 run = "cd \"$HOME/Developer/dotfiles\" && ./scripts/backup-managed-targets.sh --apply"
 
 [tasks."tools:dry-run"]
-description = "Preview locked mise tool installation"
-run = "mise install --dry-run --locked"
+description = "Check locked tools; exit nonzero if any need installing"
+run = "mise install --dry-run-code --locked"
+
+[tasks."tools:audit"]
+description = "Read-only audit of actual mise command ownership and legacy installations"
+run = 'mise --cd "$HOME/Developer/dotfiles" exec -- python3 "$HOME/Developer/dotfiles/scripts/audit-tool-ownership.py"'
+
+[tasks."tools:lock:dry-run"]
+description = "Preview global lock refresh outside the checkout (avoids symlink duplicate writes)"
+run = "MISE_LOCKED=0 mise --cd /tmp lock --global --dry-run --platform macos-arm64"
+
+[tasks."bootstrap:test"]
+description = "Exercise the public bootstrap dry-run in an isolated HOME"
+run = "cd \"$HOME/Developer/dotfiles\" && ./scripts/test-bootstrap.sh"
 
 [tasks."bootstrap:status"]
 description = "Show declarative bootstrap status without applying changes"
@@ -100,6 +114,10 @@ run = "mise bootstrap status"
 [tasks."bootstrap:dry-run"]
 description = "Preview the complete public bootstrap"
 run = "mise bootstrap --dry-run"
+
+[tasks."jupyter:setup"]
+description = "Install the pinned notebook environment and register the mise Python kernel"
+run = '"$HOME/Developer/dotfiles/scripts/setup-jupyter.sh"'
 
 [tasks."pi:harness-status"]
 description = "Report whether the canonical Pi Harness checkout is ready"
@@ -110,6 +128,7 @@ description = "Run idempotent post-tool setup after mise bootstrap"
 run = [
   "cd \"$HOME/Developer/dotfiles\" && ./scripts/trust-layered-configs.sh",
   "cd \"$HOME/Developer/dotfiles\" && ./scripts/prepare-user-dirs.sh",
+  "cd \"$HOME/Developer/dotfiles\" && ./scripts/setup-jupyter.sh",
   "cd \"$HOME/Developer/dotfiles\" && ./scripts/install-vscode-extensions.sh",
   "cd \"$HOME/Developer/dotfiles\" && ./scripts/ensure-pi-harness.sh",
   "cd \"$HOME/Developer/dotfiles\" && ./scripts/validate.sh",

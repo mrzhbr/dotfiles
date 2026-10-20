@@ -1,7 +1,7 @@
 {
   "mise": {
     "node": ["node", "npm", "npx", "corepack", "pnpm", "yarn"],
-    "python": ["python", "python3"],
+    "python": ["python", "python3", "ipython", "jupyter", "jupyter-notebook", "jupyter-lab"],
     "uv": ["uv"],
     "bun": ["bun"],
     "zig": ["zig"],
@@ -22,7 +22,9 @@
     "pi": ["pi"],
     "claude-code": ["claude"],
     "codex": ["codex"],
-    "opencode": ["opencode"]
+    "opencode": ["opencode"],
+    "ctx7": ["ctx7"],
+    "browser-use": ["browser-use", "browser", "browser-use-tui", "browseruse", "bu"]
   },
   "brew": {
     "git": ["git"],
