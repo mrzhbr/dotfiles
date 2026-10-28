@@ -3,6 +3,7 @@
 
 import json
 import os
+import re
 import subprocess
 import tempfile
 import tomllib
@@ -25,11 +26,26 @@ assert "setup-jupyter.sh" in python["postinstall"]
 assert "$MISE_TOOL_INSTALL_PATH/bin/python" in python["postinstall"]
 assert any("setup-jupyter.sh" in run for run in config["tasks"]["bootstrap"]["run"])
 assert "setup-jupyter.sh" in config["tasks"]["jupyter:setup"]["run"]
+assert "python -I" in config["tasks"]["jupyter:check"]["run"]
+assert "check-jupyter.py" in config["tasks"]["jupyter:check"]["run"]
 
 requirements = (root / "config/python/requirements.txt").read_text().splitlines()
 for package in ("ipykernel", "notebook", "jupyterlab", "numpy", "pandas", "matplotlib"):
     assert any(line.startswith(f"{package}==") for line in requirements), package
-assert all("==" in line for line in requirements if line and not line.startswith("#"))
+logical = []
+continuation = ""
+for line in requirements:
+    if not line.strip() or line.startswith("#"):
+        continue
+    continuation += " " + line.strip().removesuffix("\\").strip()
+    if not line.rstrip().endswith("\\"):
+        logical.append(continuation.strip())
+        continuation = ""
+assert not continuation, "unterminated hash-locked requirement"
+assert logical and all(
+    re.fullmatch(r"[A-Za-z0-9_.-]+==[^\s]+(?: --hash=sha256:[0-9a-f]{64})+", line)
+    for line in logical
+), "every package must have an exact version and artifact hashes"
 
 with tempfile.TemporaryDirectory() as tmp:
     directory = Path(tmp)
@@ -42,10 +58,21 @@ import json, os, sys
 from pathlib import Path
 with Path(os.environ["JUPYTER_TEST_LOG"]).open("a") as handle:
     handle.write(json.dumps(sys.argv[1:]) + "\\n")
-if os.environ.get("JUPYTER_TEST_FAIL_PIP") and sys.argv[1:3] == ["-m", "pip"]:
-    sys.exit(1)
-if sys.argv[1:2] == ["-c"]:
-    print(os.environ["JUPYTER_TEST_VERSION"])
+args = sys.argv[1:]
+assert args[:1] == ["-I"], "interpreter must ignore user-site and PYTHONPATH"
+args = args[1:]
+if args[:2] == ["-m", "pip"]:
+    assert args[2] == "--isolated"
+    assert os.environ.get("PIP_CONFIG_FILE") == "/dev/null"
+    if os.environ.get("JUPYTER_TEST_FAIL_PIP"):
+        sys.exit(1)
+if args[:1] == ["-c"]:
+    if "sys.prefix" in args[1]:
+        print(Path(sys.argv[0]).parent.parent)
+    elif "platform" in args[1]:
+        print(os.environ["JUPYTER_TEST_VERSION"])
+    elif os.environ.get("JUPYTER_TEST_FAIL_IMPORT"):
+        sys.exit(1)
 """)
     interpreter.chmod(0o755)
     env = {
@@ -56,17 +83,26 @@ if sys.argv[1:2] == ["-c"]:
         "JUPYTER_TEST_VERSION": python["version"],
     }
     expected = [
+        ["-I", "-c", "import sys; print(sys.prefix)"],
         [
+            "-I",
             "-m",
             "pip",
+            "--isolated",
             "install",
+            "--require-hashes",
+            "--only-binary=:all:",
+            "--prefix",
+            str(runtime),
             "--disable-pip-version-check",
             "--requirement",
             str(root / "config/python/requirements.txt"),
         ],
-        ["-m", "pip", "check"],
-        ["-c", "import platform; print(platform.python_version())"],
+        ["-I", "-m", "pip", "--isolated", "check"],
+        ["-I", "-c", "import nbformat, nbclient, numpy, pandas, matplotlib"],
+        ["-I", "-c", "import platform; print(platform.python_version())"],
         [
+            "-I",
             "-m",
             "ipykernel",
             "install",
@@ -104,7 +140,10 @@ if sys.argv[1:2] == ["-c"]:
 
     # Private CLI Python installs must not modify the main notebook environment;
     # a real main-interpreter hook must still perform the complete setup.
-    for hook_version in ("3.13.16", python["version"]):
+    for hook_version in (
+        config["tools"]["pypi:browser-use"]["python"],
+        python["version"],
+    ):
         log.unlink(missing_ok=True)
         subprocess.run(
             [script, str(interpreter)],
@@ -130,7 +169,20 @@ if sys.argv[1:2] == ["-c"]:
         capture_output=True,
     )
     assert result.returncode != 0
-    assert len(log.read_text().splitlines()) == 1
+    assert len(recorded_calls(log)) == 2
+
+    # Dependency metadata is not enough: an actual isolated import failure must
+    # also prevent changing the registered kernel.
+    log.unlink()
+    result = subprocess.run(
+        [script, str(interpreter)],
+        env={**env, "JUPYTER_TEST_FAIL_IMPORT": "1"},
+        check=False,
+        capture_output=True,
+    )
+    assert result.returncode != 0
+    assert len(recorded_calls(log)) == 4
+    assert not any("ipykernel" in call for call in recorded_calls(log))
 
 # Reloading the public interactive config must remove a stale Homebrew alias.
 # Use only a disposable HOME and stub activation; never load private shell files.

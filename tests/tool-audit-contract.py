@@ -137,6 +137,36 @@ class AuditContract(unittest.TestCase):
         self.assertEqual(report["additional_casks"], ["anaconda"])
         self.assertTrue(any("does not prove" in x for x in report["limitations"]))
 
+    def test_jupyter_cli_alias_and_tree_sitter_library_are_distinct(self):
+        ownership = {
+            "mise": {"python": [], "tree-sitter": []},
+            "brew": {},
+            "brew-cask": {},
+        }
+        brew = {
+            "formulae": [
+                {"name": "jupyterlab", "installed": [{"version": "4.5.6"}]},
+                {"name": "tree-sitter", "installed": [{"version": "0.26.9"}]},
+                {"name": "tree-sitter-cli", "installed": [{"version": "0.26.9"}]},
+            ]
+        }
+        report = audit.make_report(
+            ownership, {}, brew, which=lambda _: None, home="/synthetic/home"
+        )
+        self.assertEqual(
+            [x["formula"] for x in report["brew_duplicates"]],
+            ["jupyterlab", "tree-sitter-cli"],
+        )
+        self.assertEqual(
+            report["native_library_overlaps"],
+            [
+                {
+                    "formula": "tree-sitter",
+                    "classification": "native-library-not-cli-duplicate",
+                }
+            ],
+        )
+
     def test_inventory_subprocesses_are_queries_only(self):
         with patch.object(
             audit.subprocess, "run", return_value=SimpleNamespace(stdout="{}")

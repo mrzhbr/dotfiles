@@ -56,8 +56,8 @@ formula definition. Neither result proves absence of external/project consumers.
 The initial audit found a real cutover gap: `bazelisk` belonged to mise but
 `bazel` still resolved to Homebrew. The postinstall now creates a guarded relative
 `bazel` symlink inside the mise prefix. A no-download local-Bazel fixture verifies
-argument forwarding. All **46 mise-owned commands** now resolve to their selected
-installations. The hook uses mise's documented `MISE_TOOL_INSTALL_PATH` variable;
+argument forwarding. All **49 mise-owned commands**, including the pinned Python
+development CLIs, now resolve to their selected installations. The hook uses mise's documented `MISE_TOOL_INSTALL_PATH` variable;
 the older `MISE_INSTALL_PATH` name was not supplied by this mise version.
 
 ## 2. Consolidate standalone helper installers
@@ -95,6 +95,24 @@ remain mise-owned; native linkage and Brew service-state equality pass. Reviewed
 managed executable sources contain no hardcoded references to those retired
 prefixes. No autoremove, general cleanup, service restart or app-data removal ran.
 
+The next batch retired **Brew JupyterLab**, bringing the total to **11** Brew
+CLI removals. Its extension set matched the mise environment, no Brew consumers
+or active Jupyter/Brew Python processes were found, and isolated notebook
+execution passed before and after removal. Program-code rollback material was
+retained; notebooks, user settings and other environments were not removed.
+
+That check exposed a real dependency leak: some frozen notebook/development
+requirements were satisfied only by the old Python user-site directory. Setup
+now uses Python `-I`, isolated pip with configuration disabled, and an explicit
+interpreter prefix. Fifteen already-pinned distributions were installed into
+mise's Python without version changes. User-site copies were left intact, not
+silently pruned. Isolated imports must pass before kernel registration.
+
+Run `mise run jupyter:check` for the live functional check: it uses a temporary
+HOME, a test-owned kernel over Unix IPC, and no user-site packages. It executes
+NumPy/Pandas computation and renders a Matplotlib PNG without personal notebooks
+or user configuration. Static validation does not substitute for this check.
+
 Further candidates still need review. The audit produces **review candidates**,
 not uninstall instructions.
 
@@ -110,10 +128,18 @@ For each batch:
    migration.
 5. Re-run ownership, functionality and native linkage checks before continuing.
 
-After leaf removal, reassess dependency chains such as Brew Jupyter → Node,
-AWS CLI → Python 3.13, and Neovim → tree-sitter. Brew Python 3.14 and Java still
-have other installed consumers, so replacing the default shell runtime alone
-is not justification to uninstall them.
+After these removals, Brew Node and Python 3.13 have no recorded Brew consumers;
+that alone is not proof they are unused outside Homebrew. Brew Python 3.14 and
+Java still have installed consumers. A bounded metadata-only project scan on
+20 October additionally found **14 virtual environments using Brew Python 3.14**
+and **11 using a separate Python.org 3.13 installation**. Project names/paths
+stay in the private local audit, not this repository. Base interpreters must be
+retained until dependent projects are rebuilt and tested against mise runtimes.
+
+Homebrew's `tree-sitter` formula provides the C library and headers, not the
+CLI supplied by mise. Only `tree-sitter-cli` was a duplicate command provider;
+the audit now reports the native library separately. Do not assume the mise CLI
+can replace applications or build configurations linking that library.
 
 NVM, Conda, old Rust/Cargo/pipx locations, PostgreSQL 14, and optional GUI apps
 need explicit keep/migrate/retire decisions. Directory presence does not prove
@@ -139,9 +165,22 @@ application should be deleted or ignored for security maintenance.
 The read-only audit itself never uninstalls anything. The approved CLI batches
 and helper migrations above were applied separately; full workstation
 consolidation is not yet complete. NVM, Conda, databases, GUI apps and personal
-configuration remain untouched. Newly unneeded Brew Python 3.13/tree-sitter and
-other old runtime installations require project/consumer review, not a blanket
-prune. Keep them distinct from the still-required native Python/Java/Node chains.
+configuration remain untouched. Old runtime installations require project and
+consumer review, not a blanket prune. Distinguish obsolete CLI providers from
+native libraries, project-dependent interpreters and retained mise versions.
+The only legacy pipx application found was SuperClaude 4.1.9. On 23 October,
+after explicit approval, its installer and both pipx command links were removed
+with a program-source backup; Claude settings and installed framework
+configuration were not accessed or changed. pipx now reports no installed
+applications; the pipx manager and its Python were not removed. NVM still
+contains old AI CLI/plugin copies and optional tools that need explicit
+keep/migrate/retire decisions before changing protected managers.
+
+The [23 October security follow-up](security-review-2026-10-23.md) supersedes any
+inference that successful functional smokes establish current security. It
+records newly disclosed and older outstanding issues separately from the
+consolidation work; security updates and new release-age exceptions require
+their own approval.
 
 Mise 2026.10.15's empty-HOME **tool installer dry-run** incorrectly requires real
 PyPI prerequisites. The isolated bootstrap tests therefore preview non-tool

@@ -1,5 +1,8 @@
 # Shared mise Python environment: notebooks, scientific packages, and Python CLIs.
 # Keep these separate from project-specific environments.
+# Security exceptions approved 2026-10-23: packaging trust after the CA incident.
+certifi==2026.10.19
+pip==26.2.2
 ipykernel==7.4.0
 ipython==9.17.1
 jupyterlab==4.6.4

@@ -15,7 +15,14 @@ MISE_IDS = {
     "ctx7": "npm:ctx7",
     "browser-use": "pypi:browser-use",
 }
-BREW_NAMES = {"openjdk": "java", "tree-sitter-cli": "tree-sitter"}
+BREW_NAMES = {
+    "openjdk": "java",
+    "tree-sitter-cli": "tree-sitter",
+    "jupyterlab": "python",
+}
+# Homebrew splits this C library/headers from its tree-sitter-cli formula.
+# The mise CLI is not a replacement for applications linking this library.
+BREW_LIBRARY_ONLY = {"tree-sitter"}
 
 
 def display_path(path, home):
@@ -96,7 +103,7 @@ def make_report(ownership, mise, brew, *, which=shutil.which, home=None):
         name = formula["name"]
         base = name.split("@", 1)[0]
         owner = BREW_NAMES.get(base, base)
-        if owner not in ownership["mise"]:
+        if owner not in ownership["mise"] or name in BREW_LIBRARY_ONLY:
             continue
         users = sorted(consumers.get(formula.get("full_name", name), set()))
         duplicates.append(
@@ -140,6 +147,11 @@ def make_report(ownership, mise, brew, *, which=shutil.which, home=None):
     return {
         "commands": commands,
         "brew_duplicates": sorted(duplicates, key=lambda x: x["formula"]),
+        "native_library_overlaps": [
+            {"formula": f["name"], "classification": "native-library-not-cli-duplicate"}
+            for f in formulae
+            if f["name"] in BREW_LIBRARY_ONLY
+        ],
         "additional_requested_formulae": extra_formulae,
         "additional_casks": extra_casks,
         "legacy_locations_present": [
@@ -216,6 +228,13 @@ def main(argv=None):
             print(
                 f"  {item['formula']}: {item['classification']}; consumers: {consumers}"
             )
+        print(
+            "\nNative libraries, not duplicate CLIs: "
+            + (
+                ", ".join(x["formula"] for x in report["native_library_overlaps"])
+                or "none"
+            )
+        )
         print(
             "\nAdditional requested formulae: "
             + (", ".join(report["additional_requested_formulae"]) or "none")

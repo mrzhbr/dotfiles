@@ -15,10 +15,14 @@ PYTHON="${1:-$(mise --cd "$ROOT" where python)/bin/python}"
 
 # Use the new interpreter explicitly: PATH can still contain the previous Python
 # while mise is running a postinstall hook.
-"$PYTHON" -m pip install --disable-pip-version-check --requirement "$ROOT/config/python/requirements.txt"
-"$PYTHON" -m pip check
-version="$("$PYTHON" -c 'import platform; print(platform.python_version())')"
-"$PYTHON" -m ipykernel install --user --name mise-python --display-name "Python $version (mise)"
+# Ignore ambient user-site packages and pip configuration: otherwise pip can
+# report success while required packages live outside this mise installation.
+prefix="$("$PYTHON" -I -c 'import sys; print(sys.prefix)')"
+PIP_CONFIG_FILE=/dev/null "$PYTHON" -I -m pip --isolated install --require-hashes --only-binary=:all: --prefix "$prefix" --disable-pip-version-check --requirement "$ROOT/config/python/requirements.txt"
+PIP_CONFIG_FILE=/dev/null "$PYTHON" -I -m pip --isolated check
+"$PYTHON" -I -c 'import nbformat, nbclient, numpy, pandas, matplotlib'
+version="$("$PYTHON" -I -c 'import platform; print(platform.python_version())')"
+"$PYTHON" -I -m ipykernel install --user --name mise-python --display-name "Python $version (mise)"
 
 # Versioned kernels from earlier installs are intentionally left alone so saved
 # notebooks can continue using their original interpreter until migrated.

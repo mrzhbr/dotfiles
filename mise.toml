@@ -7,12 +7,13 @@ minimum_release_age = "7d"
 idiomatic_version_file_enable_tools = ["java", "node", "python", "rust", "zig"]
 
 [tools]
-node = { version = "24.21.0", postinstall = "corepack enable" }
-python = { version = "3.14.8", postinstall = '"$HOME/Developer/dotfiles/scripts/setup-jupyter.sh" "$MISE_TOOL_INSTALL_PATH/bin/python"' }
-uv = "0.13.0"
-bun = "1.4.3"
+# Security exceptions approved 2026-10-23; the general 7d policy remains above.
+node = { version = "24.22.1", postinstall = "corepack enable" }
+python = { version = "3.14.9", postinstall = '"$HOME/Developer/dotfiles/scripts/setup-jupyter.sh" "$MISE_TOOL_INSTALL_PATH/bin/python"' }
+uv = "0.13.5"
+bun = "1.4.4"
 zig = "0.16.0"
-rust = { version = "1.93.1", profile = "default", components = [
+rust = { version = "1.99.1", profile = "default", components = [
   "clippy",
   "rustfmt",
   "rust-analyzer",
@@ -20,9 +21,9 @@ rust = { version = "1.93.1", profile = "default", components = [
 ], targets = [
   "aarch64-apple-darwin",
 ] }
-java = "temurin-25.0.4+101.0.LTS"
+java = "temurin-25.0.5+8.0.LTS"
 maven = "3.9.16"
-awscli = "2.37.13"
+awscli = "2.38.4"
 bazelisk = { version = "1.29.0", postinstall = 'bash "$HOME/Developer/dotfiles/scripts/setup-bazelisk.sh" "$MISE_TOOL_INSTALL_PATH"' }
 gh = "2.102.0"
 git-filter-repo = "2.47.0"
@@ -34,11 +35,13 @@ tree-sitter = "0.27.1"
 "github:tectonic-typesetting/tectonic" = "0.17.0"
 herdr = "0.9.3"
 "npm:@earendil-works/pi-coding-agent" = "1.3.0"
-claude-code = "2.1.299"
-codex = "0.162.1"
+claude-code = "2.1.309"
+codex = "0.164.0"
 opencode = "1.19.0"
 "npm:ctx7" = "0.4.2"
-"pypi:browser-use" = { version = "0.13.11", python = "3.13.16" }
+# Upstream still exact-pins vulnerable dependencies: keep normal entrypoints
+# quarantined on every install until a supported corrected graph is reviewed.
+"pypi:browser-use" = { version = "0.13.11", python = "3.13.17", postinstall = 'python3 -I -S "$HOME/Developer/dotfiles/scripts/quarantine-browser-use.py" "$MISE_TOOL_INSTALL_PATH"' }
 
 [bootstrap.packages]
 "brew:git" = "latest"
@@ -118,6 +121,10 @@ run = "mise bootstrap --dry-run"
 [tasks."jupyter:setup"]
 description = "Install the pinned notebook environment and register the mise Python kernel"
 run = '"$HOME/Developer/dotfiles/scripts/setup-jupyter.sh"'
+
+[tasks."jupyter:check"]
+description = "Execute an isolated notebook with mise Python, without user-site dependencies"
+run = 'mise --cd "$HOME/Developer/dotfiles" exec -- python -I "$HOME/Developer/dotfiles/scripts/check-jupyter.py"'
 
 [tasks."pi:harness-status"]
 description = "Report whether the canonical Pi Harness checkout is ready"

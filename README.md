@@ -11,6 +11,10 @@ The runtime baseline was refreshed on 20 October 2026 with mise 2026.10.15.
 Jupyter Notebook and JupyterLab use mise Python and the `mise-python` kernel.
 Reviewed version changes, breaking changes, and temporary holds are recorded in
 [`docs/housekeeping-2026-10.md`](docs/housekeeping-2026-10.md).
+The 23 October approved security updates retain the general `7d` policy;
+[applied status and remaining risks](docs/security-review-2026-10-23.md) are
+tracked separately. Browser-use remains quarantined: the latest upstream helper
+exact-pins vulnerable dependencies, so normal CLI and SDK imports are blocked.
 Pi Harness retains host/model ownership opt-outs. Private machine metadata
 remains in the separate private overlay repository; native services and macOS
 preferences are not changed by runtime housekeeping.
@@ -61,6 +65,20 @@ before reading content. Only the exact generated roots `.pi/subagents/` and
 `.ruff_cache/` are excluded from content scans; any tracked file there fails.
 Gitleaks scans the same reviewed public-source export, never runtime transcripts.
 Keep agent artifacts outside the checkout whenever possible.
+
+Exercise the live notebook environment without personal notebooks, configuration
+or Python user-site dependencies:
+
+```bash
+mise run jupyter:check
+```
+
+This launches a temporary Unix-IPC kernel and checks computation/rendering.
+It is separate from the configuration-only validation above. To repair the
+pinned environment, use `mise run jupyter:setup`. Its complete requirements
+have exact versions and artifact hashes; setup requires hashes and binary wheels.
+Regenerate only with `--generate-hashes` and review the resulting version/hash
+diff (see the housekeeping procedure).
 
 Check that all locked tools are already installed (nonzero if any are missing):
 

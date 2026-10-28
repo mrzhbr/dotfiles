@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Keep public pins, lock entries, minimum version and reviewed documentation aligned."""
 
+import re
+import shlex
 import tomllib
 from pathlib import Path
 
@@ -22,7 +24,41 @@ for name, pin in versions.items():
     expected = {pin} | (private_python if name == "python" else set())
     actual = [entry["version"] for entry in locked[name]]
     assert len(actual) == len(expected) and set(actual) == expected, name
-assert config["tools"]["pypi:browser-use"]["python"] == "3.13.16"
+browser_helper = tools["pypi:browser-use"]
+assert browser_helper["python"] == "3.13.17"
+# Every locked replay must reapply quarantine, using only the selected prefix.
+assert shlex.split(browser_helper["postinstall"]) == [
+    "python3",
+    "-I",
+    "-S",
+    "$HOME/Developer/dotfiles/scripts/quarantine-browser-use.py",
+    "$MISE_TOOL_INSTALL_PATH",
+], "browser helper installs must fail closed through the quarantine hook"
+assert (root / "scripts/quarantine-browser-use.py").is_file()
+
+# Retain exact, hashed artifacts for the complete Python graph, including all
+# direct requirements and the explicitly reviewed packaging-trust fixes.
+requirements = (root / "config/python/requirements.txt").read_text()
+logical_requirements = requirements.replace("\\\n", " ").splitlines()
+package_pins = {}
+for line in logical_requirements:
+    if not line.strip() or line.startswith("#"):
+        continue
+    match = re.fullmatch(
+        r"([A-Za-z0-9_.-]+)==([^\s]+)(?:\s+--hash=sha256:[0-9a-f]{64})+\s*",
+        line,
+    )
+    assert match, "Python requirements must be exact pins with SHA-256 hashes"
+    name, version = match.groups()
+    assert name not in package_pins, f"duplicate Python requirement: {name}"
+    package_pins[name] = version
+for line in (root / "config/python/requirements.in").read_text().splitlines():
+    if not line.strip() or line.startswith("#"):
+        continue
+    name, version = line.split("==")
+    assert package_pins.get(name) == version, f"direct Python pin drift: {name}"
+assert package_pins["pip"] == "26.2.2"
+assert package_pins["certifi"] == "2026.10.19"
 assert tomllib.loads((root / "mise.lock").read_text())["lockfile_version"] == 3
 for name, kind in (
     ("npm:ctx7", "aube"),
@@ -43,6 +79,7 @@ review = (root / "docs/housekeeping-2026-10.md").read_text()
 assert f"mise {minimum} or newer" in readme, "README minimum mise version drift"
 assert f"with mise {minimum}." in readme, "README runtime baseline version drift"
 assert f"**{minimum}**" in review, "reviewed mise minimum version drift"
+assert "--generate-hashes" in review, "document hash-preserving Python lock refresh"
 bootstrap = (root / "scripts/test-bootstrap.sh").read_text()
 assert '["min_version"]["hard"]' in bootstrap, "bootstrap must derive the minimum"
 workflow = (root / ".github/workflows/validate.yml").read_text()
@@ -80,7 +117,7 @@ for label, name in labels.items():
         versions[name].removeprefix("temurin-") if name == "java" else versions[name]
     )
     assert rows.get(label) == expected, f"reviewed pin drift: {name}"
-for label, name in (("Rust remains", "rust"), ("Zig remains", "zig")):
+for label, name in (("Rust selected", "rust"), ("Zig remains", "zig")):
     assert f"**{label} {versions[name]}:**" in review, (
         f"hold documentation drift: {name}"
     )

@@ -3,15 +3,17 @@
 lockfile_version = 3
 
 [[tools.awscli]]
-version = "2.37.13"
+version = "2.38.4"
 backend = "aqua:aws/aws-cli"
+specifiers = ["2.38.4"]
 
 [tools.awscli."platforms.macos-arm64"]
-url = "https://awscli.amazonaws.com/AWSCLIV2-2.37.13.pkg"
+url = "https://awscli.amazonaws.com/AWSCLIV2-2.38.4.pkg"
 
 [[tools.bazelisk]]
 version = "1.29.0"
 backend = "aqua:bazelbuild/bazelisk"
+specifiers = ["1.29.0"]
 
 [tools.bazelisk."platforms.macos-arm64"]
 checksum = "sha256:cee851f726789227d5561004e9904a52be45c3efb56f8b38b6993d6adbaa0409"
@@ -19,34 +21,38 @@ url = "https://github.com/bazelbuild/bazelisk/releases/download/v1.29.0/bazelisk
 url_api = "https://api.github.com/repos/bazelbuild/bazelisk/releases/assets/406879037"
 
 [[tools.bun]]
-version = "1.4.3"
+version = "1.4.4"
 backend = "core:bun"
+specifiers = ["1.4.4"]
 
 [tools.bun."platforms.macos-arm64"]
-checksum = "sha256:80afd4c069b46a6fa8f3ec520bebc750a7843e4a8d5b9583d29ad436c00a3403"
-url = "https://github.com/oven-sh/bun/releases/download/bun-v1.4.3/bun-darwin-aarch64.zip"
+checksum = "sha256:c240d7f0ccb90c263a849fcdb09b7ee62630d921348ed6aafda86b9d577bc510"
+url = "https://github.com/oven-sh/bun/releases/download/bun-v1.4.4/bun-darwin-aarch64.zip"
 
 [[tools.claude-code]]
-version = "2.1.299"
+version = "2.1.309"
 backend = "aqua:anthropics/claude-code"
+specifiers = ["2.1.309"]
 
 [tools.claude-code."platforms.macos-arm64"]
-checksum = "sha256:dd2579ba8cf89b58bb57228ba26546ac070fec981d0ceed33754f1a3911787aa"
-url = "https://github.com/anthropics/claude-code/releases/download/v2.1.299/claude-darwin-arm64.tar.gz"
-url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/638660937"
+checksum = "sha256:09a74f9e0493ebea7e8867565ae04c8989575e6ef1d0a84e3b392c8065284395"
+url = "https://github.com/anthropics/claude-code/releases/download/v2.1.309/claude-darwin-arm64.tar.gz"
+url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/667004521"
 
 [[tools.codex]]
-version = "0.162.1"
+version = "0.164.0"
 backend = "aqua:openai/codex"
+specifiers = ["0.164.0"]
 
 [tools.codex."platforms.macos-arm64"]
-checksum = "sha256:88e37ccddf5a0f4ea9dc1be13c66a2a94f9c2d1a04f3ace9053d71b3939e885d"
-url = "https://github.com/openai/codex/releases/download/rust-v0.162.1/codex-package-aarch64-apple-darwin.tar.gz"
-url_api = "https://api.github.com/repos/openai/codex/releases/assets/625989262"
+checksum = "sha256:dd99e9092270691a67bdde7be04ac283dea9da8e86cbde356c2cc851a79205fa"
+url = "https://github.com/openai/codex/releases/download/rust-v0.164.0/codex-package-aarch64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/openai/codex/releases/assets/667983476"
 
 [[tools.gh]]
 version = "2.102.0"
 backend = "aqua:cli/cli"
+specifiers = ["2.102.0"]
 
 [tools.gh."platforms.macos-arm64"]
 checksum = "sha256:da922c20d1792e5b2cbf375593d7a658acf034c12c84e007e71c76ef959c337e"
@@ -63,6 +69,7 @@ uv = { path = ".mise/locks/git-filter-repo/2.47.0", digest = "sha256:19565de371c
 [[tools."github:tectonic-typesetting/tectonic"]]
 version = "0.17.0"
 backend = "github:tectonic-typesetting/tectonic"
+specifiers = ["0.17.0"]
 
 [tools."github:tectonic-typesetting/tectonic"."platforms.macos-arm64"]
 checksum = "sha256:a3f1cac7c5678f01661a92212f58480ae3b0634115d880dbc59e2953ded45667"
@@ -72,6 +79,7 @@ url_api = "https://api.github.com/repos/tectonic-typesetting/tectonic/releases/a
 [[tools.gitleaks]]
 version = "8.30.1"
 backend = "aqua:gitleaks/gitleaks"
+specifiers = ["8.30.1"]
 
 [tools.gitleaks."platforms.macos-arm64"]
 checksum = "sha256:b40ab0ae55c505963e365f271a8d3846efbc170aa17f2607f13df610a9aeb6a5"
@@ -81,6 +89,7 @@ url_api = "https://api.github.com/repos/gitleaks/gitleaks/releases/assets/378332
 [[tools.hadolint]]
 version = "2.15.1"
 backend = "aqua:hadolint/hadolint"
+specifiers = ["2.15.1"]
 
 [tools.hadolint."platforms.macos-arm64"]
 checksum = "sha256:5c09f3213f8e40406abe048233d985eebef336d4a6a20021be47fadb6cf480a2"
@@ -91,6 +100,7 @@ provenance = "github-attestations"
 [[tools.herdr]]
 version = "0.9.3"
 backend = "aqua:ogulcancelik/herdr"
+specifiers = ["0.9.3"]
 
 [tools.herdr."platforms.macos-arm64"]
 checksum = "sha256:5173a3e0ae42d5d1ab7ebfa5d5e6329f7c3d23f8e1a3677c7ce3231da2884157"
@@ -98,16 +108,18 @@ url = "https://github.com/herdrdev/herdr/releases/download/v0.9.3/herdr-macos-aa
 url_api = "https://api.github.com/repos/herdrdev/herdr/releases/assets/599036381"
 
 [[tools.java]]
-version = "temurin-25.0.4+101.0.LTS"
+version = "temurin-25.0.5+8.0.LTS"
 backend = "core:java"
+specifiers = ["temurin-25.0.5+8.0.LTS"]
 
 [tools.java."platforms.macos-arm64"]
-checksum = "sha256:61979887f7506a24a57439ff99adb8b3a7fc89977d9cfe3b8984f58a981b7b9d"
-url = "https://github.com/adoptium/temurin25-binaries/releases/download/jdk-25.0.4.1%2B1/OpenJDK25U-jdk_aarch64_mac_hotspot_25.0.4.1_1.tar.gz"
+checksum = "sha256:36dc14d797aaff6d89aab302cd053fdba6207dfdcf772052fa7b023a94b0e857"
+url = "https://github.com/adoptium/temurin25-binaries/releases/download/jdk-25.0.5%2B8/OpenJDK25U-jdk_aarch64_mac_hotspot_25.0.5_8.tar.gz"
 
 [[tools.maven]]
 version = "3.9.16"
 backend = "aqua:apache/maven"
+specifiers = ["3.9.16"]
 
 [tools.maven."platforms.macos-arm64"]
 checksum = "sha512:831a8591fe20c8243b1dbe7d71e3244f31d1665b0804b2e825e38cbbe5ce0cafb8338851f90780735568773e0a6cd07bbec107cda0b896b008b861075358b6f6"
@@ -116,17 +128,19 @@ url = "https://archive.apache.org/dist/maven/maven-3/3.9.16/binaries/apache-mave
 [[tools.neovim]]
 version = "0.12.6"
 backend = "vfox:mise-plugins/vfox-neovim"
+specifiers = ["0.12.6"]
 
 [tools.neovim."platforms.macos-arm64"]
 url = "https://github.com/neovim/neovim/releases/download/v0.12.6/nvim-macos-arm64.tar.gz"
 
 [[tools.node]]
-version = "24.21.0"
+version = "24.22.1"
 backend = "core:node"
+specifiers = ["24.22.1"]
 
 [tools.node."platforms.macos-arm64"]
-checksum = "sha256:bed7eea5325e1108f32ce5228ddd6a5f0f08a499ee42aa7442aea583702f6057"
-url = "https://nodejs.org/dist/v24.21.0/node-v24.21.0-darwin-arm64.tar.gz"
+checksum = "sha256:89c682593d76cd44233fa53b1563264e7de9cbb189cad169135c5b4fadfbc0a7"
+url = "https://nodejs.org/dist/v24.22.1/node-v24.22.1-darwin-arm64.tar.gz"
 
 [[tools."npm:@earendil-works/pi-coding-agent"]]
 version = "1.3.0"
@@ -143,6 +157,7 @@ specifiers = ["0.4.2"]
 [[tools.opencode]]
 version = "1.19.0"
 backend = "aqua:anomalyco/opencode"
+specifiers = ["1.19.0"]
 
 [tools.opencode."platforms.macos-arm64"]
 checksum = "sha256:0d5f511948d6fbfedf9bb16753c0ac42613dcc8de75d9deb7e8d0cf584c8fba6"
@@ -153,34 +168,35 @@ url_api = "https://api.github.com/repos/anomalyco/opencode/releases/assets/62945
 version = "0.13.11"
 backend = "pypi:browser-use"
 specifiers = ["0.13.11"]
-uv = { path = ".mise/locks/pypi-browser-use/0.13.11~6e964ce0", digest = "sha256:3042d6809a54b6e52143ec1f80c32418e4dabca2cd2d2531e250a872fb2b037b" }
+uv = { path = ".mise/locks/pypi-browser-use/0.13.11~c57bc4e3", digest = "sha256:3af1a66275eccaf5459e3ef2dea76df035beb26c960a3d67188371510bc3480c" }
 
 [tools."pypi:browser-use".options]
-python = "3.13.16"
+python = "3.13.17"
 
 [[tools.python]]
-version = "3.14.8"
+version = "3.14.9"
 backend = "core:python"
-specifiers = ["3.14.8"]
+specifiers = ["3.14.9"]
 
 [tools.python."platforms.macos-arm64"]
-checksum = "sha256:994adadc202c5df0b4570192cc9a70e3f2c131e512f4a125c56efa8562f44b28"
-url = "https://github.com/astral-sh/python-build-standalone/releases/download/20261013/cpython-3.14.8+20261013-aarch64-apple-darwin-install_only_stripped.tar.gz"
+checksum = "sha256:9f8c3480b8f0db553c270db548e8a21ae8e39df412e5661d66e8050c5c6ed2a8"
+url = "https://github.com/astral-sh/python-build-standalone/releases/download/20261021/cpython-3.14.9+20261021-aarch64-apple-darwin-install_only_stripped.tar.gz"
 provenance = "github-attestations"
 
 [[tools.python]]
-version = "3.13.16"
+version = "3.13.17"
 backend = "core:python"
-specifiers = ["3.13.16"]
+specifiers = ["3.13.17"]
 
 [tools.python."platforms.macos-arm64"]
-checksum = "sha256:16a5332fb0dcb77f163fc8f8cbccd95be1644cc53e68e5d2a79f50afd6680a0e"
-url = "https://github.com/astral-sh/python-build-standalone/releases/download/20261013/cpython-3.13.16+20261013-aarch64-apple-darwin-install_only_stripped.tar.gz"
+checksum = "sha256:8dc60610a82f1e73be7faf964383e02520f95f6e39592a5c37c3809f5a7b798e"
+url = "https://github.com/astral-sh/python-build-standalone/releases/download/20261021/cpython-3.13.17+20261021-aarch64-apple-darwin-install_only_stripped.tar.gz"
 provenance = "github-attestations"
 
 [[tools.rust]]
-version = "1.93.1"
+version = "1.99.1"
 backend = "core:rust"
+specifiers = ["1.99.1"]
 
 [tools.rust.options]
 components = "clippy,rust-analyzer,rust-src,rustfmt"
@@ -190,6 +206,7 @@ targets = "aarch64-apple-darwin"
 [[tools.shellcheck]]
 version = "0.11.0"
 backend = "aqua:koalaman/shellcheck"
+specifiers = ["0.11.0"]
 
 [tools.shellcheck."platforms.macos-arm64"]
 checksum = "sha256:56affdd8de5527894dca6dc3d7e0a99a873b0f004d7aabc30ae407d3f48b0a79"
@@ -199,6 +216,7 @@ url_api = "https://api.github.com/repos/koalaman/shellcheck/releases/assets/2790
 [[tools.tree-sitter]]
 version = "0.27.1"
 backend = "aqua:tree-sitter/tree-sitter"
+specifiers = ["0.27.1"]
 
 [tools.tree-sitter."platforms.macos-arm64"]
 checksum = "sha256:46cb97d9a2c52c94e22d9a76c2f1116156b8b61f98360e2a9cce05fcb197cd4d"
@@ -207,18 +225,20 @@ url_api = "https://api.github.com/repos/tree-sitter/tree-sitter/releases/assets/
 provenance = "github-attestations"
 
 [[tools.uv]]
-version = "0.13.0"
+version = "0.13.5"
 backend = "aqua:astral-sh/uv"
+specifiers = ["0.13.5"]
 
 [tools.uv."platforms.macos-arm64"]
-checksum = "sha256:a9c1b29002cf3c83f07fa9cd8a887a3be0107d90e23189721221e7257db8e3d6"
-url = "https://github.com/astral-sh/uv/releases/download/0.13.0/uv-aarch64-apple-darwin.tar.gz"
-url_api = "https://api.github.com/repos/astral-sh/uv/releases/assets/626002972"
+checksum = "sha256:743f85035a1996ecb350659e01cd9faea9709829be09b1b4b03c73eaf3c9cd73"
+url = "https://github.com/astral-sh/uv/releases/download/0.13.5/uv-aarch64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/astral-sh/uv/releases/assets/664335803"
 provenance = "github-attestations"
 
 [[tools.zig]]
 version = "0.16.0"
 backend = "core:zig"
+specifiers = ["0.16.0"]
 
 [tools.zig."platforms.macos-arm64"]
 checksum = "sha256:b23d70deaa879b5c2d486ed3316f7eaa53e84acf6fc9cc747de152450d401489"

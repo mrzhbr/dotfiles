@@ -1,7 +1,7 @@
 {
   "mise": {
     "node": ["node", "npm", "npx", "corepack", "pnpm", "yarn"],
-    "python": ["python", "python3", "ipython", "jupyter", "jupyter-notebook", "jupyter-lab"],
+    "python": ["python", "python3", "ipython", "jupyter", "jupyter-notebook", "jupyter-lab", "jedi-language-server", "ruff", "yamllint"],
     "uv": ["uv"],
     "bun": ["bun"],
     "zig": ["zig"],
