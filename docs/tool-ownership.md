@@ -56,8 +56,10 @@ security clearance. See [the security follow-up](security-review-2026-10-23.md).
 ## Native package layer
 
 Native libraries, services, terminal infrastructure, and GUI applications stay
-in `[bootstrap.packages]`. PostgreSQL 18 is installed on new machines but is not
-started automatically. Docker Desktop and Ollama remain on-demand. Spotifyd,
+in `[bootstrap.packages]`. Ripgrep supplies Telescope's configured live-grep
+command and shell search. PostgreSQL 18 is installed on new machines but is not
+started automatically; its keg-only client directory is on the login-shell
+PATH. Docker Desktop and Ollama remain on-demand. Spotifyd,
 Anaconda, R/RStudio, Solana, and Anchor/AVM are excluded.
 
 The machine-readable contract is `tool-ownership.json`; `tests/ownership.py`

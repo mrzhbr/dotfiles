@@ -39,9 +39,22 @@ configuration checks and runtime smoke tests are rerun when pins change.
 See `docs/tool-ownership.md`, `docs/architecture.md`, and
 `docs/cutover.md`.
 
+## Terminal workspaces
+
+Rex is an **experimental, opt-in trial**, not a replacement for the existing
+terminal setup. Its [Herdr-compatible workflow](docs/rex-workflow.md) keeps the
+Ctrl-S navigation keys and adds direct local/remote session shortcuts. Native
+Rex shortcuts remain available. **Ghostty and Herdr remain installed and managed
+as supported fallbacks**, with their configurations unchanged.
+Rex itself is installed separately during its beta; no app/server restart is
+part of applying this configuration. Personal endpoints stay outside git in
+`~/.config/rex/local.lua` (only `init.lua` is managed by the public layer).
+
 ## Validation
 
-These checks are safe and do not apply configuration:
+These checks are safe and do not apply configuration. The Rex contract test
+uses Lua/LuaJIT or the already-managed Neovim's isolated Lua runtime (CI installs
+Lua alongside ShellCheck and Gitleaks):
 
 ```bash
 ./scripts/check-safety.sh

@@ -140,6 +140,33 @@ assert config["settings"]["minimum_release_age"] == "7d", (
 )
 assert locked["git-filter-repo"][0]["backend"] == "pypi:git-filter-repo"
 
+# Rex is an experiment: retain the stable terminal owners and their dotfiles.
+assert "herdr" in tools, "retain Herdr as a fallback"
+assert config["bootstrap"]["packages"]["brew-cask:ghostty"] == "latest"
+assert config["dotfiles"]["~/.config/herdr/config.toml"]["source"].endswith(
+    "/dotfiles/herdr/config.toml"
+)
+assert config["dotfiles"]["~/Library/Application Support/com.mitchellh.ghostty/config"][
+    "source"
+].endswith("/dotfiles/ghostty/config")
+assert config["dotfiles"]["~/.config/rex/init.lua"]["source"].endswith(
+    "/dotfiles/rex/init.lua"
+)
+assert "~/.config/rex" not in config["dotfiles"], (
+    "do not replace Rex's personal config directory"
+)
+assert "experimental" in readme.lower() and "fallbacks" in readme.lower()
+
+assert config["tasks"]["bootstrap"]["depends"] == ["bootstrap:public"]
+public_steps = config["tasks"]["bootstrap:public"]["run"]
+assert any("install-vscode-extensions.sh" in step for step in public_steps)
+assert any("setup-jupyter.sh" in step for step in public_steps)
+assert config["bootstrap"]["packages"]["brew:ripgrep"] == "latest"
+assert (
+    "/opt/homebrew/opt/postgresql@18/bin"
+    in (root / "dotfiles/zsh/.zprofile").read_text()
+)
+
 lock_preview = config["tasks"]["tools:lock:dry-run"]["run"]
 assert "mise --cd /tmp lock --global --dry-run --platform macos-arm64" in lock_preview
 assert "MISE_LOCKED=0" in lock_preview

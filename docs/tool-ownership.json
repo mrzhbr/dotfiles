@@ -37,7 +37,8 @@
     "poppler": ["pdftotext", "pdfinfo"],
     "postgresql@18": ["psql", "pg_ctl"],
     "ollama": ["ollama"],
-    "tree": ["tree"]
+    "tree": ["tree"],
+    "ripgrep": ["rg"]
   },
   "brew-cask": {
     "docker-desktop": [],

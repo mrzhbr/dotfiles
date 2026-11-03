@@ -15,7 +15,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v6
         with:
-          python-version: '3.14'
+          python-version: "3.14"
       - name: Read required mise version
         id: mise-version
         run: |
@@ -30,7 +30,7 @@ jobs:
           install: false
           cache: false
       - name: Install validation tools only
-        run: brew install shellcheck gitleaks
+        run: brew install shellcheck gitleaks lua
       - name: Validate public contracts and safety
         run: ./scripts/validate.sh
       - name: Exercise isolated public bootstrap preview

@@ -24,7 +24,10 @@ config = tomllib.loads((root / "mise.toml").read_text())
 python = config["tools"]["python"]
 assert "setup-jupyter.sh" in python["postinstall"]
 assert "$MISE_TOOL_INSTALL_PATH/bin/python" in python["postinstall"]
-assert any("setup-jupyter.sh" in run for run in config["tasks"]["bootstrap"]["run"])
+assert config["tasks"]["bootstrap"]["depends"] == ["bootstrap:public"]
+assert any(
+    "setup-jupyter.sh" in run for run in config["tasks"]["bootstrap:public"]["run"]
+)
 assert "setup-jupyter.sh" in config["tasks"]["jupyter:setup"]["run"]
 assert "python -I" in config["tasks"]["jupyter:check"]["run"]
 assert "check-jupyter.py" in config["tasks"]["jupyter:check"]["run"]

@@ -43,6 +43,14 @@ fi
 
 "$ROOT/tests/herdr-config-contract.py"
 "$ROOT/tests/tmux-config-contract.py"
+if command -v luajit >/dev/null 2>&1; then
+	luajit "$ROOT/tests/rex-config-contract.lua" "$ROOT"
+elif command -v lua >/dev/null 2>&1; then
+	lua "$ROOT/tests/rex-config-contract.lua" "$ROOT"
+else
+	# Neovim is already mise-owned; use its Lua without loading user config/state.
+	nvim --headless -u NONE -i NONE -l "$ROOT/tests/rex-config-contract.lua" "$ROOT"
+fi
 "$ROOT/tests/ownership.py"
 python3 -B "$ROOT/tests/tool-audit-contract.py"
 bash "$ROOT/tests/bazelisk-contract.sh"

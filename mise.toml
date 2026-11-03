@@ -55,6 +55,7 @@ opencode = "1.19.0"
 "brew:postgresql@18" = "latest"
 "brew:ollama" = "latest"
 "brew:tree" = "latest"
+"brew:ripgrep" = "latest"
 "brew-cask:docker-desktop" = "latest"
 "brew-cask:ghostty" = "latest"
 "brew-cask:visual-studio-code" = "latest"
@@ -72,6 +73,7 @@ login_shell = "/bin/zsh"
 "~/.tmux.conf" = { source = "~/Developer/dotfiles/dotfiles/tmux/tmux.conf", mode = "symlink" }
 "~/Library/Application Support/com.mitchellh.ghostty/config" = { source = "~/Developer/dotfiles/dotfiles/ghostty/config", mode = "symlink" }
 "~/.config/herdr/config.toml" = { source = "~/Developer/dotfiles/dotfiles/herdr/config.toml", mode = "symlink" }
+"~/.config/rex/init.lua" = { source = "~/Developer/dotfiles/dotfiles/rex/init.lua", mode = "symlink" }
 "~/.config/nvim" = { source = "~/Developer/dotfiles/dotfiles/nvim", mode = "symlink" }
 "~/Library/Application Support/Code/User/settings.json" = { source = "~/Developer/dotfiles/dotfiles/vscode/settings.json", mode = "symlink" }
 "~/.ssh/config" = { source = "~/Developer/dotfiles/dotfiles/ssh/config", mode = "symlink" }
@@ -131,7 +133,11 @@ description = "Report whether the canonical Pi Harness checkout is ready"
 run = "cd \"$HOME/Developer/dotfiles\" && ./scripts/pi-harness-status.sh"
 
 [tasks.bootstrap]
-description = "Run idempotent post-tool setup after mise bootstrap"
+description = "Run public post-tool setup"
+depends = ["bootstrap:public"]
+
+[tasks."bootstrap:public"]
+description = "Run idempotent public setup without private task-name shadowing"
 run = [
   "cd \"$HOME/Developer/dotfiles\" && ./scripts/trust-layered-configs.sh",
   "cd \"$HOME/Developer/dotfiles\" && ./scripts/prepare-user-dirs.sh",
