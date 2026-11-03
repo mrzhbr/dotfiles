@@ -25,6 +25,33 @@ if "$CHECK" "$tmp/bad-path" >/dev/null 2>&1; then
   exit 1
 fi
 
+# Personal identifiers are supplied from private metadata, not hard-coded here.
+printf 'example-denied-host\n' >"$tmp/private-identifiers.txt"
+"$CHECK" --denylist "$tmp/private-identifiers.txt" "$tmp/good" >/dev/null
+mkdir -p "$tmp/bad-identifier"
+printf 'Example-Denied-Host\n' >"$tmp/bad-identifier/config.txt"
+if "$CHECK" --denylist "$tmp/private-identifiers.txt" "$tmp/bad-identifier" >"$tmp/identifier-output" 2>&1; then
+  echo "expected a configured private identifier to fail" >&2
+  exit 1
+fi
+grep -q 'private identifier in config.txt' "$tmp/identifier-output"
+if grep -qi 'example-denied-host' "$tmp/identifier-output"; then
+  echo "private identifier values must not be printed in diagnostics" >&2
+  exit 1
+fi
+: >"$tmp/empty-identifiers.txt"
+ln -s "$tmp/private-identifiers.txt" "$tmp/linked-identifiers.txt"
+for invalid in missing-identifiers.txt empty-identifiers.txt linked-identifiers.txt; do
+  if "$CHECK" --denylist "$tmp/$invalid" "$tmp/good" >/dev/null 2>&1; then
+    echo "expected a missing, empty or symlink denylist to fail" >&2
+    exit 1
+  fi
+done
+if "$CHECK" --denylist >/dev/null 2>&1; then
+  echo "expected a missing denylist argument to fail" >&2
+  exit 1
+fi
+
 # Generated artifacts may contain private runtime context. Neither scanner may
 # read them, but tracked artifacts must fail even when force-added past ignores.
 fixture="$tmp/generated"
@@ -66,4 +93,4 @@ for generated in .pi/subagents .ruff_cache; do
   grep -q 'generated artifact must not be tracked' "$tmp/scan-output"
 done
 
-echo "Safety fixture tests passed (including generated-root and untracked-file regressions)."
+echo "Safety fixture tests passed (including private identifiers, generated roots and untracked files)."

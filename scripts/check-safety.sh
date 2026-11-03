@@ -1,12 +1,20 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+usage() { echo "usage: $0 [--denylist FILE] [ROOT]" >&2; exit 2; }
+denylist=""
+if [[ "${1:-}" == "--denylist" ]]; then
+  [[ $# -ge 2 && -n "$2" ]] || usage
+  denylist="$2"
+  shift 2
+fi
+[[ $# -le 1 ]] || usage
 ROOT="${1:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
 
 scan="$(mktemp -d)"
 trap 'rm -rf "$scan"' EXIT
 
-python3 - "$ROOT" "$scan" <<'PY'
+python3 - "$ROOT" "$scan" "$denylist" <<'PY'
 from pathlib import Path
 import re
 import shutil
@@ -23,7 +31,18 @@ forbidden_names = {
 }
 forbidden_parts = {"sessions", "history", "histories", "cache", "caches"}
 forbidden_suffixes = {".log", ".sock", ".db", ".sqlite", ".sqlite3", ".pem", ".key"}
-private_aliases = ["pot" + "sdam", "frank" + "enthal"]
+# Machine-specific identifiers belong in private metadata, never this source.
+private_identifiers = []
+if sys.argv[3]:
+    denylist = Path(sys.argv[3])
+    if denylist.is_symlink() or not denylist.is_file():
+        raise SystemExit("private identifier denylist must be a regular file")
+    private_identifiers = [
+        line.strip().lower() for line in denylist.read_text().splitlines()
+        if line.strip() and not line.lstrip().startswith("#")
+    ]
+    if not private_identifiers:
+        raise SystemExit("configured private identifier denylist must not be empty")
 home_path = re.compile(r"/Users/[A-Za-z0-9._-]+")
 tailnet_ip = re.compile(r"\b100\.(?:6[4-9]|[7-9][0-9]|1[01][0-9]|12[0-7])(?:\.\d{1,3}){2}\b")
 email = re.compile(r"\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b", re.I)
@@ -71,8 +90,6 @@ for path in root.rglob("*"):
         target = export / rel
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(path, target, follow_symlinks=False)
-        if rel.as_posix() == "scripts/check-safety.sh":
-            continue
         try:
             raw = path.read_bytes()
         except OSError as exc:
@@ -86,8 +103,8 @@ for path in root.rglob("*"):
         if tailnet_ip.search(text):
             errors.append(f"private tailnet address in {rel}")
         lowered = text.lower()
-        if any(alias in lowered for alias in private_aliases):
-            errors.append(f"private host alias in {rel}")
+        if any(identifier in lowered for identifier in private_identifiers):
+            errors.append(f"private identifier in {rel}")
         for match in email.finditer(text):
             candidate = match.group(0).lower()
             if candidate == "git@github.com" or candidate.endswith("@example.com"):
