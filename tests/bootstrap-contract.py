@@ -1,14 +1,21 @@
 #!/usr/bin/env python3
-"""Regression-test isolation, trust ordering, version floor and failure propagation."""
+"""Check CI platform, isolation, trust ordering, version floor and failures."""
 
 import json
 import os
+import re
 import subprocess
 import sys
 import tempfile
 from pathlib import Path
 
 root = Path(__file__).resolve().parents[1]
+workflow = (root / ".github/workflows/validate.yml").read_text()
+# Old runner images lose Homebrew bottles. Never hide source/checksum failures
+# by skipping package previews: exercise the supported native platform instead.
+assert re.search(r"(?m)^    runs-on: macos-26$", workflow), (
+    "bootstrap CI requires the supported macOS 26 Apple Silicon runner"
+)
 with tempfile.TemporaryDirectory() as tmp:
     directory = Path(tmp)
     home = directory / "real-home"
