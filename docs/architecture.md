@@ -26,6 +26,10 @@ store.
 
 ## Behavioral contracts
 
+Public post-tool setup has the unique task name `bootstrap:public`. Both the
+public `bootstrap` alias and the private overlay's `bootstrap` depend on it,
+so loading the later private task cannot silently skip notebook/editor setup.
+
 Herdr's complete current `Ctrl-s` keymap is release-blocking and tested.
 tmux retains its `C-s` prefix while Herdr is evaluated. Pi, Claude Code, Codex,
 and OpenCode keep independent instructions.

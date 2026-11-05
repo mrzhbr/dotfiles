@@ -1,0 +1,48 @@
+name: Public validation
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    # Match the supported Apple Silicon bottle platform, not retired macOS 14.
+    runs-on: macos-26
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Verify native bootstrap platform
+        run: |
+          arch="$(uname -m)"
+          os_version="$(sw_vers -productVersion)"
+          if [[ "$arch" != arm64 || "$os_version" != 26.* ]]; then
+            echo "::error::Expected macOS 26 on Apple Silicon."
+            exit 1
+          fi
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.14"
+      - name: Read required mise version
+        id: mise-version
+        run: |
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import tomllib
+          with open("mise.toml", "rb") as handle:
+              print("version=" + tomllib.load(handle)["min_version"]["hard"])
+          PY
+      - uses: jdx/mise-action@5228313ee0372e111a38da051671ca30fc5a96db # v3
+        with:
+          version: ${{ steps.mise-version.outputs.version }}
+          install: false
+          cache: false
+      - name: Install validation tools only
+        run: brew install shellcheck gitleaks lua
+      - name: Validate public contracts and safety
+        run: ./scripts/validate.sh
+      - name: Exercise isolated public bootstrap preview
+        run: ./scripts/test-bootstrap.sh
+      - name: Check validation did not modify tracked inputs
+        run: git diff --exit-code

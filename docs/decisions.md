@@ -1,19 +1,20 @@
-# Decisions
+# Configuration decisions
 
-- Use mise as the primary bootstrap, dotfile, task, and developer-tool manager.
-- Keep a public-safe baseline and a separate private, non-secret overlay.
-- Keep Pi Harness as an independent repository.
-- Standardize Python on mise plus uv; Conda is not part of the baseline.
-- Replace NVM with mise and standardize on Node 24.19.0 LTS.
-- Use Temurin Java 25 LTS globally; projects may pin Java 17.
-- Keep Rust and Java/Maven; omit R/RStudio and Solana/Anchor.
-- Manage Neovim and VS Code only.
-- Install Pi, Claude Code, Codex, and OpenCode; keep their instructions independent.
-- Preserve Herdr's existing `Ctrl-s` configuration byte-for-byte and keep tmux
-  during the Herdr evaluation period.
-- Use generic public remote aliases; real mappings belong in the private layer.
-- Install PostgreSQL 18 on new machines without auto-starting it. Existing
-  PostgreSQL 14 data migration is separate and manual.
-- Keep Docker Desktop and Ollama on-demand; omit Spotifyd.
-- Retain Homebrew only as the native package/cask layer under mise bootstrap.
-- Never store raw secrets in either repository, including the private one.
+- Mise is the primary bootstrap, dotfile, task and developer-tool manager.
+- Exact runtime/CLI versions belong in the config and lock, not duplicated
+  operational inventories in public documentation.
+- Public configuration and the private, non-secret overlay have separate roles.
+  Credentials, login state, histories and sessions belong in neither repository.
+- Pi Harness remains independent and owns its payloads and integration assets.
+- Project environments select their own dependencies and runtimes without
+  changing the shared workstation environment.
+- Homebrew supplies native dependencies, services and GUI apps through mise
+  bootstrap declarations. Installing a service does not authorize starting it.
+- Neovim and VS Code are managed editors. Ghostty, Herdr and tmux remain
+  available; Rex is an experimental, opt-in workflow rather than their removal.
+- Public SSH/Rex examples use generic targets. Real mappings, host identifiers
+  and operational acceptance notes stay private.
+- Legacy runtime removal, application resets, database migration and restarts
+  are separate reviewed operations, not side effects of configuration validation.
+- Security exceptions are scoped; they do not silently weaken the general
+  release-age, dependency-integrity or quarantine policies.

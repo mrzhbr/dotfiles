@@ -1,52 +1,47 @@
-# Cutover checklist
+# Configuration cutover checklist
 
-Nothing in this checklist is automatic. Stop after each phase and verify before
-continuing.
+Nothing here is automatic. Review each phase and verify it before proceeding.
 
-## 1. Repository review
+## 1. Review source and destination
 
-- Validate both repositories and Pi Harness.
-- Review uncommitted files and create local commits.
-- Confirm both repositories still have no unintended remotes.
-- Confirm Pi Harness public templates contain no private endpoint.
+- Validate the public layer and any private overlay together.
+- Review committed and uncommitted paths; do not mix unrelated work.
+- Confirm remote ownership/visibility and that public templates contain no
+  credentials, real host mappings or operational inventories.
+- Keep detailed acceptance notes and machine state private.
 
-## 2. Backup
+## 2. Back up managed targets
 
-`mise run backup:dry-run` currently identifies the exact existing targets that
-would be replaced. After approval, run `mise run backup:apply`. Backups are
-created under `~/Developer/dotfiles-backups/`, outside both repositories, with
-owner-only permissions. The script copies only declared managed targets; it
-never copies auth stores, `.env`, sessions, histories, SSH keys, or AWS
-credentials.
+Run `mise run backup:dry-run`. Only after reviewing the target list should
+`mise run backup:apply` create its scoped backup outside both repositories.
+The backup script excludes authentication stores, environment files, histories,
+sessions, SSH keys and cloud credentials. Verify rollback before replacement.
 
-## 3. Install replacements without removing legacy tools
+## 3. Install replacements without removing working tools
 
-- Run the locked mise tool installation and verify versions.
-- Install PostgreSQL 18 without starting it.
-- Decide whether Homebrew should adopt the existing unmanaged VS Code app.
-- Do not remove NVM, Conda, PostgreSQL 14, Solana, or other legacy paths yet.
+Use locked selections and verify actual versions/arguments. Keep native ABI
+consumers and project environments in mind; don't remove legacy managers or
+start services simply because a new tool was installed. See
+[tool consolidation](consolidation-plan.md).
 
-## 4. Apply public dotfiles
+## 4. Apply public dotfiles deliberately
 
-Use mise's forced dotfile replacement only after the backup is verified. Test a
-new login shell before closing the current terminal. Confirm Herdr and tmux
-retain their complete `Ctrl-s` contracts.
+Apply forced replacement only after backup and explicit approval. Test a fresh
+login shell before closing the working terminal. Preserve Ghostty/Herdr/tmux
+fallbacks when trialling Rex; do not change default-terminal or server settings
+as an incidental config operation. Personal Rex files remain outside Git.
 
-## 5. Apply Pi and private overlays
+## 5. Respect separate application owners
 
-Run Pi Harness with host Pi, global helper, shell mutation, model replacement,
-and sandbox installation disabled. Then apply the private overlay, which owns
-Git identity, SSH mappings, Keychain helper functions, AI-tool configuration,
-AWS profile metadata, and the private Pi model provider.
+Pi Harness is separate and can replace settings, model configuration and
+extension/skill trees. Use its ownership opt-outs and do not rerun its full
+bootstrap merely to apply a small source change. The private overlay remains
+authoritative for private configuration; credentials remain with login stores.
+Never bypass browser/sandbox quarantine or interactive push review.
 
-## 6. Verify before cleanup
+## 6. Verify before any removal
 
-- Shell and project-local mise activation
-- Node, Python/uv, Rust, Java/Maven, and selected CLIs
-- Generic SSH aliases and GitHub credential helper
-- Neovim, VS Code, Ghostty, Herdr, and tmux
-- Independent Pi, Claude, Codex, and OpenCode instructions
-- PostgreSQL 14 data remains intact and PostgreSQL 18 is not running unless
-  deliberately started
-
-Legacy cleanup is a separate approval after these checks pass.
+Check shell/project activation, runtime versions, editor/terminal behavior,
+owned aliases and relevant native linkage. Database migration, restarts, legacy
+removal and application cleanup require their own reviewed plan. Passing tests
+is not permission to delete retained state or a claim of universal security.

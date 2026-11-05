@@ -1,11 +1,24 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+usage() { echo "usage: $0 [--denylist FILE] [ROOT]" >&2; exit 2; }
+denylist=""
+if [[ "${1:-}" == "--denylist" ]]; then
+  [[ $# -ge 2 && -n "$2" ]] || usage
+  denylist="$2"
+  shift 2
+fi
+[[ $# -le 1 ]] || usage
 ROOT="${1:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
 
-python3 - "$ROOT" <<'PY'
+scan="$(mktemp -d)"
+trap 'rm -rf "$scan"' EXIT
+
+python3 - "$ROOT" "$scan" "$denylist" <<'PY'
 from pathlib import Path
 import re
+import shutil
+import subprocess
 import sys
 
 root = Path(sys.argv[1]).resolve()
@@ -18,7 +31,18 @@ forbidden_names = {
 }
 forbidden_parts = {"sessions", "history", "histories", "cache", "caches"}
 forbidden_suffixes = {".log", ".sock", ".db", ".sqlite", ".sqlite3", ".pem", ".key"}
-private_aliases = ["pot" + "sdam", "frank" + "enthal"]
+# Machine-specific identifiers belong in private metadata, never this source.
+private_identifiers = []
+if sys.argv[3]:
+    denylist = Path(sys.argv[3])
+    if denylist.is_symlink() or not denylist.is_file():
+        raise SystemExit("private identifier denylist must be a regular file")
+    private_identifiers = [
+        line.strip().lower() for line in denylist.read_text().splitlines()
+        if line.strip() and not line.lstrip().startswith("#")
+    ]
+    if not private_identifiers:
+        raise SystemExit("configured private identifier denylist must not be empty")
 home_path = re.compile(r"/Users/[A-Za-z0-9._-]+")
 tailnet_ip = re.compile(r"\b100\.(?:6[4-9]|[7-9][0-9]|1[01][0-9]|12[0-7])(?:\.\d{1,3}){2}\b")
 email = re.compile(r"\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b", re.I)
@@ -28,10 +52,27 @@ secret_key = re.compile(
 )
 allowed_value = re.compile(r"^(?:[\"']?\$\{|[\"']?\$[A-Z_]|[\"']?<[^>]+>|[\"']?(?:none|not-needed|keychain)[\"']?$)", re.I)
 
+# These exact generated roots are never public source. Reject tracked files
+# there before skipping their content; arbitrary gitignore entries are NOT used.
+generated = (Path(".pi/subagents"), Path(".ruff_cache"))
+tracked = subprocess.run(
+    ["git", "-C", str(root), "ls-files", "-z", "--", *(str(path) for path in generated)],
+    capture_output=True, check=False,
+)
 errors: list[str] = []
+if tracked.returncode == 0:
+    for name in tracked.stdout.decode().split("\0"):
+        if name:
+            errors.append(f"generated artifact must not be tracked: {name}")
+elif (root / ".git").exists():
+    raise SystemExit("cannot check tracked generated artifacts")
+if errors:
+    raise SystemExit("Safety check failed:\n  - " + "\n  - ".join(sorted(set(errors))))
+
+export = Path(sys.argv[2])
 for path in root.rglob("*"):
     rel = path.relative_to(root)
-    if ".git" in rel.parts:
+    if rel.parts[0] == ".git" or any(rel.is_relative_to(prefix) for prefix in generated):
         continue
     lower_parts = {part.lower() for part in rel.parts}
     if path.is_file():
@@ -44,8 +85,11 @@ for path in root.rglob("*"):
         ):
             errors.append(f"forbidden tracked path: {rel}")
             continue
-        if rel.as_posix() == "scripts/check-safety.sh":
-            continue
+        # Gitleaks receives this same reviewed source set, including untracked
+        # source and ignored files outside the two explicit generated roots.
+        target = export / rel
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(path, target, follow_symlinks=False)
         try:
             raw = path.read_bytes()
         except OSError as exc:
@@ -59,8 +103,8 @@ for path in root.rglob("*"):
         if tailnet_ip.search(text):
             errors.append(f"private tailnet address in {rel}")
         lowered = text.lower()
-        if any(alias in lowered for alias in private_aliases):
-            errors.append(f"private host alias in {rel}")
+        if any(identifier in lowered for identifier in private_identifiers):
+            errors.append(f"private identifier in {rel}")
         for match in email.finditer(text):
             candidate = match.group(0).lower()
             if candidate == "git@github.com" or candidate.endswith("@example.com"):
@@ -81,7 +125,7 @@ print(f"Safety path/content checks passed: {root}")
 PY
 
 if command -v gitleaks >/dev/null 2>&1; then
-  gitleaks dir --no-banner --redact "$ROOT"
+  gitleaks dir --no-banner --redact "$scan"
   echo "Gitleaks scan passed."
 else
   echo "warning: gitleaks is unavailable; built-in safety checks passed." >&2
